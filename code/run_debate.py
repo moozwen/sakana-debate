@@ -22,7 +22,9 @@ DEBATE = (
     "You previously solved this problem. Other agents have also proposed solutions.\n\n"
     "Your previous solution:\n{own}\n\n"
     "Solutions from other agents:\n{others}\n\n"
-    "Using these solutions as additional information, carefully re-examine the problem "
+    "Using these solutions as additional information, carefully re-examine the problem. "
+    "Explain your reasoning briefly, then give the final answer as a single number in the "
+    "exact form '#### <number>' on the last line.\n\nProblem: {q}"
 )
 
 
