@@ -1,0 +1,17 @@
+# config_regime_gemma4b.yaml — Part 1b 追補 A1.3（図3 ユニバーサリティ）Gemma-3 4B
+# ★ 実行は事前登録 A1.3 のゲート成立時のみ（analyze_regime.py が判定を出力する）
+# プロンプト・温度・max_tokens・seed 方式は Qwen 系と完全に固定（交絡遮断）
+base_url: http://localhost:8000/v1
+model: google/gemma-3-4b-it
+temperature: 0.7
+max_tokens: 1024
+subset: data/gsm8k_subset_regime.jsonl
+outdir: results_regime/gemma4b
+concurrency: 8
+
+seeds: [1, 2, 3]
+
+grid:
+    - { n: 1, r: 0 }   # 床
+    - { n: 3, r: 0 }   # self-consistency
+    - { n: 3, r: 2 }   # 討論

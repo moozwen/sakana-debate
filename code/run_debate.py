@@ -42,7 +42,9 @@ def call(prompt, seed):
         max_tokens=CFG["max_tokens"],
         seed=seed,
     )
-    return resp.choices[0].message.content or ""
+    usage = getattr(resp, "usage", None)
+    tokens = getattr(usage, "completion_tokens", 0) or 0
+    return resp.choices[0].message.content or "", tokens
 
 
 def majority(preds):
@@ -63,6 +65,7 @@ def majority(preds):
 def run_problem(prob, n, r_rounds, seed):
     q = prob["question"]
     rounds, prev = [], None
+    gen_tokens = 0  # budget-fair 比較の素地（Part 1b 事前登録 §4。本パートでは主張しない）
     for rnd in range(r_rounds + 1):
         texts = []
         for a in range(n):
@@ -76,7 +79,9 @@ def run_problem(prob, n, r_rounds, seed):
                     or "(no other agents)"
                 )
                 prompt = DEBATE.format(q=q, own=prev[a], others=others)
-            texts.append(call(prompt, req_seed(seed, prob["idx"], a, rnd)))
+            text, tok = call(prompt, req_seed(seed, prob["idx"], a, rnd))
+            texts.append(text)
+            gen_tokens += tok
         rounds.append({"raw": texts, "preds": [extract(t) for t in texts]})
         prev = texts
     final = rounds[-1]["preds"]
@@ -93,6 +98,7 @@ def run_problem(prob, n, r_rounds, seed):
         "tie": tie,
         "unanimous": None not in final and len(set(final)) == 1,
         "ok": grade(maj, prob["gold"]),
+        "gen_tokens": gen_tokens,
     }
 
 
@@ -118,11 +124,6 @@ def run_condition(n, r_rounds, seed, rows):
                 f"  {n_done:>3}/{len(todo)} idx={rec['idx']:>4} ok={rec['ok']} "
                 f"maj={rec['majority']} unanimous={rec['unanimous']}"
             )
-    if os.path.exists(out):
-        recs = [json.loads(l) for l in open(out) if l.strip()]
-        acc = sum(x["ok"] for x in recs) / len(recs)
-        print(f"[N={n} R={r_rounds} seed={seed}] accuracy = {acc:.3f} ({len(recs)}問)")
-
     if os.path.exists(out):
         recs = [json.loads(l) for l in open(out) if l.strip()]
         acc = sum(x["ok"] for x in recs) / len(recs)
