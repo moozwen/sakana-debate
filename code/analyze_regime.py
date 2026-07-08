@@ -160,8 +160,7 @@ for fam, label, _, _ in SIZES:
         continue
     n_rounds = 3
     accs, fg, fb, wrong, unan_wrong = [[] for _ in range(n_rounds)], 0, 0, 0, 0
-    fmt = Counter()
-    n_resp = 0
+    fmt_rnd = [Counter() for _ in range(n_rounds)]  # 事前登録 §4: 条件×ラウンド別
     for recs in D.values():
         for rnd in range(n_rounds):
             accs[rnd].append(sum(grade(majority(r["rounds"][rnd]["preds"]), r["gold"])
@@ -173,16 +172,27 @@ for fam, label, _, _ in SIZES:
             if not r["ok"]:
                 wrong += 1
                 unan_wrong += bool(r["unanimous"])
-            for rnd in r["rounds"]:
-                for t in rnd["raw"]:
-                    fmt[extract_method(t)] += 1
-                    n_resp += 1
+            for rnd, rd in enumerate(r["rounds"]):
+                for t in rd["raw"]:
+                    fmt_rnd[rnd][extract_method(t)] += 1
+    fmt = sum(fmt_rnd, Counter())
+    n_resp = sum(fmt.values())
     traj = " -> ".join(f"{sum(a)/len(a):.3f}" for a in accs)
     uw = f"{unan_wrong}/{wrong}" if wrong else "0/0"
-    fallback = (fmt["fallback"] + fmt["none"]) / n_resp if n_resp else 0
-    none_rate = fmt["none"] / n_resp if n_resp else 0
-    print(f"  {fam} {label:>5}: {traj}  w->r:{fg} r->w:{fb}  unan-wrong:{uw}  "
-          f"format逸脱(#### 不在):{fallback:.1%}  抽出不能:{none_rate:.1%}")
+    print(f"  {fam} {label:>5}: {traj}  w->r:{fg} r->w:{fb}  unan-wrong:{uw}")
+    # format 失敗率（事前登録 §4 定義）: (ii) fallback 抽出率 = #### 不在率、(i) pred=None 率
+    hash_traj = " -> ".join(f"{fr['hash']/sum(fr.values()):.1%}" if fr else "—"
+                            for fr in fmt_rnd)
+    dist = "  ".join(f"{k}:{fmt[k]/n_resp:.1%}"
+                     for k in ("hash", "boxed", "answer_is", "fallback", "none"))
+    # 参考: 床/SC 条件（R0 のみ）の #### 遵守率
+    ref = []
+    for cl in ("floor", "sc"):
+        cnt = Counter(extract_method(t) for recs in data[(fam, label)][cl].values()
+                      for r in recs.values() for t in r["rounds"][0]["raw"])
+        ref.append(f"{cl}:{cnt['hash']/sum(cnt.values()):.1%}" if cnt else f"{cl}:—")
+    print(f"         ####遵守(討論R0->R2): {hash_traj}  抽出内訳: {dist}  "
+          f"参考({' '.join(ref)})")
 
 # ---------- (4) レジーム表（A1.1 の 4面の数値）＋図3ゲート判定（A1.3） ----------
 print("\n=== レジーム表（横軸=床精度。図1/2/4 の数値）===")
