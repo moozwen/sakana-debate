@@ -12,7 +12,8 @@ import urllib.request
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SIZES = [("0.5B", "results_regime/05b"), ("1.5B", "results_regime/15b"),
          ("3B", "results_regime/3b"), ("7B", "results_regime/7b"),
-         ("Gemma-3 1B", "results_regime/gemma1b"), ("Gemma-3 4B", "results_regime/gemma4b")]
+         ("Gemma-3 1B", "results_regime/gemma1b"), ("Gemma-3 4B", "results_regime/gemma4b"),
+         ("Llama-3.2 1B", "results_regime/llama1b"), ("Llama-3.2 3B", "results_regime/llama3b")]
 CONDS = [(1, 0), (3, 0), (3, 2)]
 SEEDS = [1, 2, 3]
 
