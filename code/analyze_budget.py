@@ -167,7 +167,8 @@ for fam, label, _ in MODELS:
     print(f"  {fam} {label:>5}: N9[0:3] vs N3_R0 {m9}/{t9} ({m9/t9:.1%})  "
           f"N9[0] vs 床 {fl}" if t9 else f"  {fam} {label:>5}: —")
     if t9 and m9 / t9 < 0.95:
-        print(f"    ⚠ 一致率が低い。入れ子（分散低減）の前提が弱い — 原因を調査してから解析を進める")
+        print("    注: 一致率 <95% は vLLM 継続バッチング非決定性による既知の挙動（1c 追補 A2 に開示済み。"
+              "ビット再現は非主張）。入れ子の分散低減は効かないが、検定・解析C の妥当性には影響なし")
 
 # ---------- (1) accuracy 表（コール数つき） ----------
 print("\n=== accuracy（3seed 平均 ± 95%CI。カッコ内 = コール数/問）===")
@@ -427,13 +428,19 @@ for fam, label, _ in MODELS:
         premise_fail.append(f"{fam} {label}")
     if r and (fam, label) == CONTROL and r[3] < 0.05 and r[0] > r[1]:
         print(f"  ⚠ §5-5: 3B（帯の外）で主検定が正 — 「探索的・要追試」と明記、確証扱いしない")
-if any(results.get((0, fam, label)) for fam, label, _ in MODELS):
+done_p2 = [f"{fam} {label}" for fam, label, _ in MODELS if results.get((0, fam, label))]
+if done_p2:
+    final = len(done_p2) == len(MODELS)
+    print(f"  [{'最終判定' if final else f'途中経過: P2 完了 {len(done_p2)}/{len(MODELS)}'}]")
     if fired:
         print(f"  §5-1 主判定: 相互作用固有の効果あり（{', '.join(fired)}）"
               f" → 該当サイズのみ第 2 段（N15_R0/N5_R2。Holm 追補を書いてから）")
-    else:
+    elif final:
         print("  §5-2: どのモデルも討論が SC N9 を有意に超えない → サンプリング帰着"
               "（第 2 段なし。Part 1b の主結果は毀損しない完結した報告）")
+    else:
+        print(f"  ここまで（{', '.join(done_p2)}）討論>SC9 のモデルなし — "
+              f"§5-1/5-2 の確定は全 {len(MODELS)} モデル完走後。Holm p は完了分のみの暫定値")
     if premise_fail:
         print(f"  §5-4 前提破綻: SC9 ≤ SC3（{', '.join(premise_fail)}）→ 該当サイズは第 2 段に進まない")
     p6 = results.get((3, "Llama3.2", "1B"))
