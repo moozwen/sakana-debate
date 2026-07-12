@@ -24,13 +24,20 @@ import matplotlib.pyplot as plt
 sys.path.insert(0, os.path.dirname(__file__))
 from grading import _NUM, grade
 
-# (family, label, size_B, outdir)。Gemma はゲート成立時のみ実行（A1.3）— 未実行なら自動スキップ
+# 図の出力先（CWD 依存で img/ が古くなる事故があったため明示パスに固定）
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+IMG = os.path.join(ROOT, "results_regime", "img")
+os.makedirs(IMG, exist_ok=True)
+
+# (family, label, size_B, outdir)。Gemma/Llama はゲート成立時のみ実行（A1.3/A2）— 未実行なら自動スキップ
 SIZES = [("Qwen2.5", "0.5B", 0.5, "results_regime/05b"),
          ("Qwen2.5", "1.5B", 1.5, "results_regime/15b"),
          ("Qwen2.5", "3B", 3.0, "results_regime/3b"),
          ("Qwen2.5", "7B", 7.0, "results_regime/7b"),
          ("Gemma3", "1B", 1.0, "results_regime/gemma1b"),
-         ("Gemma3", "4B", 4.0, "results_regime/gemma4b")]
+         ("Gemma3", "4B", 4.0, "results_regime/gemma4b"),
+         ("Llama3.2", "1B", 1.0, "results_regime/llama1b"),
+         ("Llama3.2", "3B", 3.0, "results_regime/llama3b")]
 CONDS = {"floor": (1, 0), "sc": (3, 0), "debate": (3, 2)}
 SEEDS = [1, 2, 3]
 T95_3 = 4.303  # 自由度2の t 値（3 seed）
@@ -223,13 +230,14 @@ for fam, label, size, _ in SIZES:
 gate_hits = [label for (fam, label), r in reg.items()
              if fam == "Qwen2.5" and r["sc_d"] and r["sc_d"][0] >= GATE_D
              and holm.get((fam, label, "sc>floor"), 1.0) < 0.05]
-print(f"\n図3実行ゲート（A1.3: SC>床 Holm p<0.05 かつ SC−床 ≥ +{GATE_D:.0%}）: "
-      + (f"成立（{', '.join(gate_hits)}）→ Gemma-3 1B/4B を実行" if gate_hits
-         else "不成立 → 図3（Gemma）は実行しない"))
+print(f"\n図3実行ゲート（A1.3/A2: SC>床 Holm p<0.05 かつ SC−床 ≥ +{GATE_D:.0%}）: "
+      + (f"成立（{', '.join(gate_hits)}）→ Gemma-3 1B/4B と Llama-3.2 1B/3B を実行"
+         if gate_hits else "不成立 → 図3（Gemma/Llama）は実行しない"))
 
 # ---------- (5) 判定図 ----------
 BANDS = [(0.0, 0.35, "collapse"), (0.40, 0.85, "mid"), (0.90, 1.0, "saturated")]
-FAM_STYLE = {"Qwen2.5": ("tab:blue", "o"), "Gemma3": ("tab:orange", "D")}
+FAM_STYLE = {"Qwen2.5": ("tab:blue", "o"), "Gemma3": ("tab:orange", "D"),
+             "Llama3.2": ("tab:green", "s")}
 
 
 def band_axes(ax):
@@ -270,7 +278,7 @@ ax2.set_title("Fig2  debate − SC — predicted: ≤ 0 everywhere")
 plot_delta(ax3, "sc_d", FAM_STYLE)
 ax3.set_ylabel("SC − floor (paired)")
 ax3.set_xlabel("single-agent floor accuracy (N1_R0)")
-ax3.set_title("Fig3  cross-family universality (Gemma overlaid, gated)")
+ax3.set_title("Fig3  cross-family universality (Gemma/Llama overlaid, gated)")
 ax3.legend(fontsize=8)
 
 for fam, (color, marker) in FAM_STYLE.items():
@@ -287,8 +295,8 @@ ax4.set_title("Fig4  mechanism: correlated errors — predicted: rising")
 
 fig.suptitle("capability-relative regime figure (preregistered, addendum A1)", y=0.995)
 fig.tight_layout()
-fig.savefig("fig_regime.png", dpi=150)
-print("wrote fig_regime.png")
+fig.savefig(os.path.join(IMG, "fig_regime.png"), dpi=150)
+print(f"wrote {os.path.join(IMG, 'fig_regime.png')}")
 
 # 補助図: 元 §5 のサイズ軸（Qwen のみ）
 fig, (bx1, bx2) = plt.subplots(2, 1, figsize=(6, 6.5), sharex=True,
@@ -314,5 +322,5 @@ bx2.axhline(0, ls="--", lw=1, color="gray")
 bx2.set_xlabel("model size (B params, log)")
 bx2.set_ylabel("debate − SC")
 fig.tight_layout()
-fig.savefig("fig_regime_raw.png", dpi=150)
-print("wrote fig_regime_raw.png")
+fig.savefig(os.path.join(IMG, "fig_regime_raw.png"), dpi=150)
+print(f"wrote {os.path.join(IMG, 'fig_regime_raw.png')}")
