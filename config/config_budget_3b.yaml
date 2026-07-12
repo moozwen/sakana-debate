@@ -1,0 +1,17 @@
+# config_budget_3b.yaml — Part 1c budget-fair（事前登録 §3）
+# ★ 実行は事前登録 §10 の sign-off ①〜⑦ 後。床/SC/討論は Part 1b の結果を再利用
+#   （同一 outdir・同一サブセット・同一 seed なので McNemar ペアがそのまま成立）
+# プロンプト・温度・max_tokens・seed 方式は Part 1b と完全に固定（交絡遮断）
+base_url: http://localhost:8000/v1
+model: Qwen/Qwen2.5-3B-Instruct
+temperature: 0.7
+max_tokens: 1024
+subset: data/gsm8k_subset_regime.jsonl
+outdir: results_regime/3b
+concurrency: 8
+
+seeds: [1, 2, 3]
+
+grid:
+    - { n: 9, r: 0 }   # SC 9票 = 討論 N3_R2 と予算等価（主検定 P2 の対）
+    - { n: 1, r: 2 }   # 自己再考 = SC N3_R0 と予算等価（P3。Llama では P6 の主役）

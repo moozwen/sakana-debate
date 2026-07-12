@@ -44,7 +44,8 @@ def call(prompt, seed):
     )
     usage = getattr(resp, "usage", None)
     tokens = getattr(usage, "completion_tokens", 0) or 0
-    return resp.choices[0].message.content or "", tokens
+    ptokens = getattr(usage, "prompt_tokens", 0) or 0
+    return resp.choices[0].message.content or "", tokens, ptokens
 
 
 def majority(preds):
@@ -66,6 +67,8 @@ def run_problem(prob, n, r_rounds, seed):
     q = prob["question"]
     rounds, prev = [], None
     gen_tokens = 0  # budget-fair 比較の素地（Part 1b 事前登録 §4。本パートでは主張しない）
+    prompt_tokens = 0  # Part 1c 事前登録 §3.3: 入力トークン実測（budget=コール数定義の併記用）
+    max_prompt_tokens = 0  # 同 §3.3: コンテキスト逼迫の監視（条件別打ち切り率の素地）
     for rnd in range(r_rounds + 1):
         texts = []
         for a in range(n):
@@ -79,9 +82,11 @@ def run_problem(prob, n, r_rounds, seed):
                     or "(no other agents)"
                 )
                 prompt = DEBATE.format(q=q, own=prev[a], others=others)
-            text, tok = call(prompt, req_seed(seed, prob["idx"], a, rnd))
+            text, tok, ptok = call(prompt, req_seed(seed, prob["idx"], a, rnd))
             texts.append(text)
             gen_tokens += tok
+            prompt_tokens += ptok
+            max_prompt_tokens = max(max_prompt_tokens, ptok)
         rounds.append({"raw": texts, "preds": [extract(t) for t in texts]})
         prev = texts
     final = rounds[-1]["preds"]
@@ -99,6 +104,8 @@ def run_problem(prob, n, r_rounds, seed):
         "unanimous": None not in final and len(set(final)) == 1,
         "ok": grade(maj, prob["gold"]),
         "gen_tokens": gen_tokens,
+        "prompt_tokens": prompt_tokens,
+        "max_prompt_tokens": max_prompt_tokens,
     }
 
 

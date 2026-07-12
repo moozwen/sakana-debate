@@ -14,7 +14,7 @@ SIZES = [("0.5B", "results_regime/05b"), ("1.5B", "results_regime/15b"),
          ("3B", "results_regime/3b"), ("7B", "results_regime/7b"),
          ("Gemma-3 1B", "results_regime/gemma1b"), ("Gemma-3 4B", "results_regime/gemma4b"),
          ("Llama-3.2 1B", "results_regime/llama1b"), ("Llama-3.2 3B", "results_regime/llama3b")]
-CONDS = [(1, 0), (3, 0), (3, 2)]
+CONDS = [(1, 0), (3, 0), (3, 2), (9, 0), (1, 2)]  # (9,0)/(1,2) は Part 1c（対象外モデルは — のまま）
 SEEDS = [1, 2, 3]
 
 
@@ -97,7 +97,7 @@ for label, outdir in SIZES:
             if lines < exp and (running is None or st.st_mtime > running[4]):
                 running = (label, f"N{n}_R{r}", s, lines, st.st_mtime, st.st_ctime)
         print(f"  N{n}_R{r}: " + " | ".join(cells))
-print(f"\n完了ファイル: {n_done_files}/{n_files}（Qwen 4サイズで36が満了）")
+print(f"\n完了ファイル: {n_done_files}/{n_files}（1b=3条件×8モデル、1c は +2条件×5モデル）")
 
 if running:
     label, cond, s, lines, mtime, ctime = running
