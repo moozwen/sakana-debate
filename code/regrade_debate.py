@@ -1,4 +1,4 @@
-# regrade_debate.py — 保存済み討論ログ(results/*.jsonl)を修正版 extract で採点し直す。
+# regrade_debate.py — 保存済み討論ログ(*.jsonl)を修正版 extract で採点し直す。
 # GPU再実行不要。rounds[].raw の生テキストから preds/majority/ok を再計算する。
 # 使い方: cd sakana-debate && python code/regrade_debate.py [results_dir]
 import glob
@@ -9,7 +9,7 @@ from collections import Counter
 
 from grading import extract, grade
 
-RESULTS_DIR = sys.argv[1] if len(sys.argv) > 1 else "results"
+RESULTS_DIR = sys.argv[1] if len(sys.argv) > 1 else "experiments/phase1_grid/results"
 
 
 def majority(preds):
@@ -64,7 +64,7 @@ def main():
             f"{os.path.basename(fn):30} {len(recs):>4} "
             f"{old_acc:>8.3f} {new_acc:>8.3f} {null_rate:>11.3f}"
         )
-    print("done — results/*.jsonl を修正版 extract で上書き採点しました")
+    print(f"done — {RESULTS_DIR}/*.jsonl を修正版 extract で上書き採点しました")
 
 
 if __name__ == "__main__":

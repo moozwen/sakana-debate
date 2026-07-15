@@ -23,7 +23,7 @@ def ci(vals):
 
 # --- 読み込み：条件 (n,r) → {seed: [recs]} ---
 data = defaultdict(dict)
-for path in glob.glob("results/debate_N*_R*_seed*.jsonl"):
+for path in glob.glob("experiments/phase1_grid/results/debate_N*_R*_seed*.jsonl"):
     recs = [json.loads(l) for l in open(path) if l.strip()]
     if recs:
         data[(recs[0]["n"], recs[0]["r"])][recs[0]["seed"]] = recs
@@ -58,9 +58,9 @@ def plot_slice(pairs, xkey, fixed_label, fname):
 r_slice = [(r, (3, r)) for r in [0, 1, 2, 3] if (3, r) in acc]
 n_slice = [(n, (n, 2)) for n in [1, 2, 4, 6] if (n, 2) in acc]
 if r_slice:
-    plot_slice(r_slice, "rounds R", "N=3", "analysis/results/fig_r_curve.png")
+    plot_slice(r_slice, "rounds R", "N=3", "experiments/phase1_grid/figures/fig_r_curve.png")
 if n_slice:
-    plot_slice(n_slice, "agents N", "R=2", "analysis/results/fig_n_curve.png")
+    plot_slice(n_slice, "agents N", "R=2", "experiments/phase1_grid/figures/fig_n_curve.png")
 
 # --- RQ5：不一致は誤りの予測子か ---
 print("\n=== RQ5: unanimity vs accuracy（最終ラウンドの全会一致で層別） ===")

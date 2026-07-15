@@ -5,12 +5,12 @@
 import json
 import os
 
-SRC = "results"
-DST = "results_regime/7b"
+SRC = "experiments/phase1_grid/results"
+DST = "experiments/phase1b_1c_regime_budget/results/7b"
 CONDS = [(1, 0), (3, 0), (3, 2)]  # 床 / SC / 討論
 SEEDS = [1, 2, 3]
 
-regime_idx = {json.loads(l)["idx"] for l in open("data/gsm8k_subset_regime.jsonl")}
+regime_idx = {json.loads(l)["idx"] for l in open("experiments/phase1b_1c_regime_budget/data/gsm8k_subset_regime.jsonl")}
 os.makedirs(DST, exist_ok=True)
 
 for n, r in CONDS:

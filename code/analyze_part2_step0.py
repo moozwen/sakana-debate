@@ -21,7 +21,7 @@
 #   末尾: P1〜P5 と K1/K2 の判定文（8 モデル揃わないうちは暫定表示）
 #
 # 使い方: cd sakana-debate && python code/analyze_part2_step0.py [data_root]
-#   data_root 省略時 = results_regime（実データ）。合成データでのスモークテスト用に差し替え可。
+#   data_root 省略時 = experiments/phase1b_1c_regime_budget/results（実データ）。合成データでのスモークテスト用に差し替え可。
 import json
 import os
 import random
@@ -39,7 +39,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from grading import grade
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, "results_regime")
+DATA = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, "experiments/phase1b_1c_regime_budget/results")
 IMG = os.path.join(DATA, "img")
 os.makedirs(IMG, exist_ok=True)
 

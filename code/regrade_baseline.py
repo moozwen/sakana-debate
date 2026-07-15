@@ -25,7 +25,7 @@ STILL_WRONG = {
     570,
 }  # C: 真の誤り9件 → 誤りのまま
 
-rows = [json.loads(l) for l in open("data/baseline_results.jsonl") if l.strip()]
+rows = [json.loads(l) for l in open("experiments/phase1_grid/data/baseline_results.jsonl") if l.strip()]
 ok = {r["idx"]: grade(extract(r["raw"]), r["gold"]) for r in rows}
 total = sum(ok.values())
 print(f"regraded accuracy = {total}/{len(rows)} = {total / len(rows):.3f}")

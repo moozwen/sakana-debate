@@ -4,8 +4,8 @@ base_url: http://localhost:8000/v1
 model: Qwen/Qwen2.5-3B-Instruct
 temperature: 0.7
 max_tokens: 1024
-subset: data/gsm8k_subset_regime.jsonl
-outdir: results_regime/3b
+subset: experiments/phase1b_1c_regime_budget/data/gsm8k_subset_regime.jsonl
+outdir: experiments/phase1b_1c_regime_budget/results/3b
 concurrency: 8
 
 seeds: [1, 2, 3]

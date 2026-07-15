@@ -11,7 +11,7 @@
 #   (5) format / prompt_tokens・コンテキスト逼迫の監視（§3.3）
 #   (6) 解析C: SC 天井シミュレーション（§4.1。N9 の 3seed×9agent=27 サンプルプール。
 #       床/N3/討論R0 は N9 agent0-2 と同一リクエスト seed のため足さない = 重複排除は構成上保証）
-#   (7) fig_budget.png（予算曲線、モデルごと 1 面）→ results_regime/img/ に明示保存
+#   (7) fig_budget.png（予算曲線、モデルごと 1 面）→ experiments/phase1b_1c_regime_budget/results/img/ に明示保存
 #   (8) §5 判定ルールの機械適用（主判定 / §5-4 前提 / P6 / 3B 対照 / C-1・C-2）
 # 第 2 段（N15_R0 / N5_R2）はファイルがあれば曲線に重畳するが、検定には入れない
 # （追加検定の Holm ファミリは実行前に追補で固定する — 事前登録 §4）。
@@ -33,15 +33,16 @@ sys.path.insert(0, os.path.dirname(__file__))
 from grading import _NUM, grade
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-IMG = os.path.join(ROOT, "results_regime", "img")
+REGIME_ROOT = "experiments/phase1b_1c_regime_budget/results"
+IMG = os.path.join(ROOT, REGIME_ROOT, "img")
 os.makedirs(IMG, exist_ok=True)
 
 # コア 5 モデル（事前登録 §3.1。実行順 = この並び）
-MODELS = [("Qwen2.5", "0.5B", "results_regime/05b"),
-          ("Qwen2.5", "1.5B", "results_regime/15b"),
-          ("Gemma3", "1B", "results_regime/gemma1b"),
-          ("Llama3.2", "1B", "results_regime/llama1b"),
-          ("Qwen2.5", "3B", "results_regime/3b")]
+MODELS = [("Qwen2.5", "0.5B", f"{REGIME_ROOT}/05b"),
+          ("Qwen2.5", "1.5B", f"{REGIME_ROOT}/15b"),
+          ("Gemma3", "1B", f"{REGIME_ROOT}/gemma1b"),
+          ("Llama3.2", "1B", f"{REGIME_ROOT}/llama1b"),
+          ("Qwen2.5", "3B", f"{REGIME_ROOT}/3b")]
 POSITIVE = {("Qwen2.5", "0.5B"), ("Qwen2.5", "1.5B"), ("Gemma3", "1B")}  # §5-1 主判定の対象
 BAND = POSITIVE | {("Llama3.2", "1B")}  # §5-4 前提チェックの対象（帯内 4 点）
 CONTROL = ("Qwen2.5", "3B")  # §5-5 境界対照

@@ -26,18 +26,19 @@ from grading import _NUM, grade
 
 # 図の出力先（CWD 依存で img/ が古くなる事故があったため明示パスに固定）
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-IMG = os.path.join(ROOT, "results_regime", "img")
+REGIME_ROOT = "experiments/phase1b_1c_regime_budget/results"
+IMG = os.path.join(ROOT, REGIME_ROOT, "img")
 os.makedirs(IMG, exist_ok=True)
 
 # (family, label, size_B, outdir)。Gemma/Llama はゲート成立時のみ実行（A1.3/A2）— 未実行なら自動スキップ
-SIZES = [("Qwen2.5", "0.5B", 0.5, "results_regime/05b"),
-         ("Qwen2.5", "1.5B", 1.5, "results_regime/15b"),
-         ("Qwen2.5", "3B", 3.0, "results_regime/3b"),
-         ("Qwen2.5", "7B", 7.0, "results_regime/7b"),
-         ("Gemma3", "1B", 1.0, "results_regime/gemma1b"),
-         ("Gemma3", "4B", 4.0, "results_regime/gemma4b"),
-         ("Llama3.2", "1B", 1.0, "results_regime/llama1b"),
-         ("Llama3.2", "3B", 3.0, "results_regime/llama3b")]
+SIZES = [("Qwen2.5", "0.5B", 0.5, f"{REGIME_ROOT}/05b"),
+         ("Qwen2.5", "1.5B", 1.5, f"{REGIME_ROOT}/15b"),
+         ("Qwen2.5", "3B", 3.0, f"{REGIME_ROOT}/3b"),
+         ("Qwen2.5", "7B", 7.0, f"{REGIME_ROOT}/7b"),
+         ("Gemma3", "1B", 1.0, f"{REGIME_ROOT}/gemma1b"),
+         ("Gemma3", "4B", 4.0, f"{REGIME_ROOT}/gemma4b"),
+         ("Llama3.2", "1B", 1.0, f"{REGIME_ROOT}/llama1b"),
+         ("Llama3.2", "3B", 3.0, f"{REGIME_ROOT}/llama3b")]
 CONDS = {"floor": (1, 0), "sc": (3, 0), "debate": (3, 2)}
 SEEDS = [1, 2, 3]
 T95_3 = 4.303  # 自由度2の t 値（3 seed）

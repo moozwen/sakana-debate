@@ -10,16 +10,17 @@ import time
 import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SIZES = [("0.5B", "results_regime/05b"), ("1.5B", "results_regime/15b"),
-         ("3B", "results_regime/3b"), ("7B", "results_regime/7b"),
-         ("Gemma-3 1B", "results_regime/gemma1b"), ("Gemma-3 4B", "results_regime/gemma4b"),
-         ("Llama-3.2 1B", "results_regime/llama1b"), ("Llama-3.2 3B", "results_regime/llama3b")]
+REGIME_ROOT = "experiments/phase1b_1c_regime_budget/results"
+SIZES = [("0.5B", f"{REGIME_ROOT}/05b"), ("1.5B", f"{REGIME_ROOT}/15b"),
+         ("3B", f"{REGIME_ROOT}/3b"), ("7B", f"{REGIME_ROOT}/7b"),
+         ("Gemma-3 1B", f"{REGIME_ROOT}/gemma1b"), ("Gemma-3 4B", f"{REGIME_ROOT}/gemma4b"),
+         ("Llama-3.2 1B", f"{REGIME_ROOT}/llama1b"), ("Llama-3.2 3B", f"{REGIME_ROOT}/llama3b")]
 CONDS = [(1, 0), (3, 0), (3, 2), (9, 0), (1, 2)]  # (9,0)/(1,2) は Part 1c（対象外モデルは — のまま）
 SEEDS = [1, 2, 3]
 
 
 def n_expected():
-    fn = os.path.join(ROOT, "data/gsm8k_subset_regime.jsonl")
+    fn = os.path.join(ROOT, "experiments/phase1b_1c_regime_budget/data/gsm8k_subset_regime.jsonl")
     try:
         return sum(1 for l in open(fn) if l.strip())
     except OSError:
